@@ -137,6 +137,9 @@ results_tb <- merge(results_tb, (data_filtered %>% tibble::rownames_to_column(.,
 results_significant_tb <- results_tb %>% 
   dplyr::filter(padj < padj.cutoff & abs(log2FoldChange) >= lfc.cutoff)
 
+results_significant_tb_without_LFC <- results_tb %>%
+  dplyr::filter(padj < padj.cutoff)
+
 # Visualize volcano-plots
 EnhancedVolcano(results_tb,
                 lab = results_tb$gene_symbol, 
@@ -146,6 +149,17 @@ EnhancedVolcano(results_tb,
                 subtitle = NULL,
                 pCutoff = padj.cutoff, 
                 FCcutoff = lfc.cutoff,
+                xlim = c(-2, 2),
+                ylim = c(NA, 4))
+
+EnhancedVolcano(results_tb,
+                lab = results_tb$gene_symbol, 
+                x = 'log2FoldChange',
+                y = 'padj', 
+                title = 'KO vs Control, PBS',
+                subtitle = NULL,
+                pCutoff = padj.cutoff, 
+                FCcutoff = 0,
                 xlim = c(-2, 2),
                 ylim = c(NA, 4))
 
@@ -191,5 +205,15 @@ enrichmentGO <- enrichGO(gene = results_significant_tb$gene,
 
 
 cowplot::plot_grid(barplot(enrichmentGO))
+
+enrichmentGO_no_LFC <- enrichGO(gene = results_significant_tb_without_LFC$gene, 
+                         universe = results_tb$gene, 
+                         keyType = "ENSEMBL",
+                         OrgDb = org.Hs.eg.db, 
+                         ont = "BP",
+                         pAdjustMethod = "BH", 
+                         pvalueCutoff = 0.1)
+
+cowplot::plot_grid(barplot(enrichmentGO_no_LFC))
 
 
