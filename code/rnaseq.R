@@ -140,6 +140,7 @@ results_significant_tb <- results_tb %>%
 results_significant_tb_without_LFC <- results_tb %>%
   dplyr::filter(padj < padj.cutoff)
 
+
 # Visualize volcano-plots
 EnhancedVolcano(results_tb,
                 lab = results_tb$gene_symbol, 
